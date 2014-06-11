@@ -42,7 +42,7 @@
 
   (iter 1.0 2.0))
   
-;; 1.8
+;; 1.8 (cubed root)
 (define (curt x)
   ; based on newtons method 
   ; (x / y^2 + 2y) / 3
@@ -85,34 +85,26 @@
           (else      (iter (* acc b) (- n 1)))))
   (iter b n))
 
+
+;; 1.17
+(define (remainder a b)
+  (define (iter a left-over)
+    (cond ((< left-over 0) a)
+          ((= left-over 0) 0)
+          ((> left-over 0) (iter left-over (- left-over b)))))
+    (iter a (- a b)))
+    
+(define (double a) (+ a a))
+
+(define (halve a) (/ a 2))
+
+(define (even? n) (= (remainder n 2) 0))
+
 (define (mul a b)
   (if (= b 0)
     0
     (+ a (mul a (- b 1)))))
 
-;; 1.17
-
-;; (define (remainder a b)
-;;   (define (iter a left-over)
-;;     (cond ((< left-over 0) a)
-;;           ((= left-over 0) 0)
-;;           ((> left-over 0) (iter left-over (- left-over b)))))
-;;     (iter a (- a b)))
-
-(define (mul a b)
-    (if (= b 0)
-      0
-      (+ a (* a (- b 1)))))
-    
-(define (double a) 
-  (+ a a))
-
-(define (halve a) 
-  (/ a 2))
-
-;; (define (even? n) 
-;;   (= (remainder n 2) 0))
-    
 (define (fast-mul a b)
   (cond ((= b 1) a)
         ((= b 0) 0)
@@ -120,4 +112,57 @@
         (else (+ a (fast-mul a (- b 1))))))
 
 ;; 1.18
+(define (fast-iter-mul a b)
+  (define (iter acc n)
+    (cond ((= n 1) acc)
+          ((= n 0) acc)
+          ((even? n) (iter (double acc) (halve n)))
+          (else      (iter (+ a acc) (- n 1)))))
+  (iter a b))
+
+;; TODO 1.21 -> 1.28
+
+
+;; 1.29
+(define (sum term a next b)
+  (if (> a b)
+      0
+      (+ (term a)
+         (sum term (next a) next b))))
+
+;; ???
+
+;; 1.30
+
+(define (sum term a next max)
+  (define (iter a acc)
+    (if (< a max)
+        acc
+        (iter (next a) (+ (term a) acc))))
+  (iter a 0))
+
+;; 1.31
+
+(define (product term a next max)
+  (define (iter a acc)
+    (if (< a max)
+        acc
+        (iter (next a) (* (term a) acc)))))
+
+(define (factorial n)
+  (define (term a) a)
+  (define (next a) (+ a 1))
+  (product term 1 next n))
+
+
+; 1.32
+
+(define (accumulator combinator base-value term a next max)
+  (define (iter a acc)
+    (if (< a max)
+        0
+        (iter (next a)
+              (combinator (term a) acc))))
+  (iter a base-value))
+
 
